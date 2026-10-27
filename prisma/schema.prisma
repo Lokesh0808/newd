@@ -1,0 +1,211 @@
+// ---------------------------------------------------------------------------
+// CareerAI — Prisma schema
+// PostgreSQL (works with a local Postgres, Docker, or Supabase as-is).
+// ---------------------------------------------------------------------------
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Billing tiers ---------------------------------------------------------
+
+enum Plan {
+  FREE
+  PRO
+}
+
+// --- NextAuth / Auth.js models ---------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  /// bcrypt hash — only set for credential (email + password) accounts.
+  passwordHash  String?
+  plan          Plan      @default(FREE)
+  /// Stripe identifiers for the Pro subscription.
+  stripeCustomerId     String? @unique
+  stripeSubscriptionId String? @unique
+  stripePriceId        String?
+  subscriptionStatus   String?
+  subscriptionRenewsAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts     Account[]
+  sessions     Session[]
+  resumes      Resume[]
+  interviews   InterviewSession[]
+  coverLetters CoverLetter[]
+
+  @@index([plan])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --- Resume maker ----------------------------------------------------------
+
+model Resume {
+  id     String @id @default(cuid())
+  userId String
+  /// User facing name of this resume version, e.g. "Frontend Engineer – Acme".
+  title  String @default("Untitled resume")
+
+  /// The full structured resume payload (see `src/lib/resume-schema.ts`).
+  data          Json
+  /// Template key from `src/lib/resume/templates.ts` (e.g. "modern").
+  template      String @default("modern")
+  /// Accent colour token key, e.g. "indigo".
+  accentColor   String @default("indigo")
+  /// Font family key, e.g. "inter".
+  fontFamily    String @default("inter")
+  /// The job description the resume was tailored against (optional).
+  jobDescription String? @db.Text
+  /// ATS keyword-match score, 0-100 (null until a tailor run).
+  atsScore      Int?
+  /// Keywords the ATS scan found missing, stored for the UI badge list.
+  atsMissing   String[] @default([])
+  /// Keywords the ATS scan matched.
+  atsMatched   String[] @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coverLetters CoverLetter[]
+
+  @@index([userId, updatedAt])
+}
+
+model CoverLetter {
+  id        String   @id @default(cuid())
+  userId    String
+  resumeId  String?
+  /// Job title / company the letter targets.
+  jobTitle  String   @default("")
+  company   String   @default("")
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resume Resume? @relation(fields: [resumeId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+}
+
+// --- Mock interviews --------------------------------------------------------
+
+model InterviewSession {
+  id     String @id @default(cuid())
+  userId String
+
+  /// Job role the interview is for, e.g. "Senior Frontend Engineer".
+  role            String
+  /// junior | mid | senior | lead
+  experienceLevel String  @default("mid")
+  /// hr | technical | behavioral | system-design
+  interviewType   String  @default("mixed")
+  /// How many questions the user asked for.
+  questionCount   Int     @default(5)
+  /// Whether the user's resume was used to personalise questions.
+  usedResume      Boolean @default(false)
+
+  /// in_progress | completed | abandoned
+  status      String    @default("in_progress")
+  /// Overall 0-100 score, filled in when the session completes.
+  overallScore Int?
+  /// Aggregate category scores: clarity, relevance, confidence, structure.
+  scores      Json?
+  strengths   String[]  @default([])
+  weaknesses  String[]  @default([])
+  /// Actionable tips shown on the end-of-session report.
+  tips        String[]  @default([])
+  /// A few model answers the AI wrote for the questions asked.
+  sampleAnswers Json?
+  /// Short written feedback per question (keyed by question id).
+  perQuestionFeedback Json?
+
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questions InterviewQuestion[]
+
+  @@index([userId, createdAt])
+}
+
+model InterviewQuestion {
+  id        String @id @default(cuid())
+  sessionId String
+  /// Order the question was asked in (1-based).
+  order     Int
+  /// The question text.
+  question  String @db.Text
+  /// hr | technical | behavioral | system-design
+  category  String @default("mixed")
+  /// Set when this question is a follow-up to a previous one.
+  followUpOfId String?
+  /// The user's answer.
+  answer    String? @db.Text
+  /// Seconds the user spent on this question (timer feature).
+  durationSeconds Int?
+  /// Per-answer scores: clarity, relevance, confidence, structure.
+  scores    Json?
+  /// 0-100 score for this single answer.
+  score     Int?
+  /// Short written feedback for this answer.
+  feedback  String? @db.Text
+  /// A better way to phrase the answer.
+  betterAnswer String? @db.Text
+  /// STAR method coverage (0-4): Situation, Task, Action, Result.
+  starCoverage Json?
+
+  createdAt DateTime @default(now())
+
+  session InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, order])
+}

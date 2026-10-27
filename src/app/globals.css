@@ -1,0 +1,357 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Dark mode is class driven (see src/components/theme-provider.tsx).
+   Tailwind v4 needs an explicit custom variant to wire the `.dark` class up.
+   --------------------------------------------------------------------------- */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   Design tokens
+   A single violet-blue accent ("brand") powers every gradient in the product.
+   --------------------------------------------------------------------------- */
+:root {
+  --radius: 0.85rem;
+
+  --background: oklch(0.99 0.004 275);
+  --foreground: oklch(0.21 0.025 275);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.21 0.025 275);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.21 0.025 275);
+
+  --primary: oklch(0.55 0.21 285);
+  --primary-foreground: oklch(0.99 0.004 275);
+  --secondary: oklch(0.96 0.008 275);
+  --secondary-foreground: oklch(0.28 0.035 275);
+
+  --muted: oklch(0.965 0.006 275);
+  --muted-foreground: oklch(0.52 0.022 275);
+
+  --accent: oklch(0.945 0.028 285);
+  --accent-foreground: oklch(0.36 0.09 285);
+
+  --success: oklch(0.6 0.15 155);
+  --success-foreground: oklch(0.99 0.004 275);
+  --warning: oklch(0.75 0.15 75);
+  --warning-foreground: oklch(0.24 0.05 75);
+  --destructive: oklch(0.58 0.21 27);
+  --destructive-foreground: oklch(0.99 0.004 275);
+
+  --border: oklch(0.91 0.008 275);
+  --input: oklch(0.91 0.008 275);
+  --ring: oklch(0.55 0.21 285);
+
+  /* Brand scale used for gradients and hero glows. */
+  --brand-50: oklch(0.97 0.02 285);
+  --brand-100: oklch(0.94 0.05 285);
+  --brand-200: oklch(0.88 0.1 285);
+  --brand-300: oklch(0.8 0.15 285);
+  --brand-400: oklch(0.7 0.19 285);
+  --brand-500: oklch(0.61 0.21 285);
+  --brand-600: oklch(0.53 0.21 285);
+  --brand-700: oklch(0.46 0.19 285);
+  --brand-800: oklch(0.39 0.16 285);
+  --brand-900: oklch(0.33 0.13 285);
+  --brand-950: oklch(0.23 0.09 285);
+
+  /* Secondary accent used in gradients (cyan/indigo). */
+  --accent-2: oklch(0.6 0.18 250);
+  --accent-3: oklch(0.65 0.2 320);
+}
+
+.dark {
+  --background: oklch(0.16 0.017 275);
+  --foreground: oklch(0.96 0.005 275);
+
+  --card: oklch(0.2 0.019 275);
+  --card-foreground: oklch(0.96 0.005 275);
+  --popover: oklch(0.2 0.019 275);
+  --popover-foreground: oklch(0.96 0.005 275);
+
+  --primary: oklch(0.7 0.17 285);
+  --primary-foreground: oklch(0.16 0.017 275);
+  --secondary: oklch(0.26 0.022 275);
+  --secondary-foreground: oklch(0.94 0.006 275);
+
+  --muted: oklch(0.26 0.02 275);
+  --muted-foreground: oklch(0.71 0.02 275);
+
+  --accent: oklch(0.28 0.05 285);
+  --accent-foreground: oklch(0.93 0.03 285);
+
+  --success: oklch(0.7 0.15 155);
+  --success-foreground: oklch(0.16 0.017 275);
+  --warning: oklch(0.8 0.14 75);
+  --warning-foreground: oklch(0.2 0.04 75);
+  --destructive: oklch(0.65 0.2 25);
+  --destructive-foreground: oklch(0.99 0.004 275);
+
+  --border: oklch(0.3 0.022 275);
+  --input: oklch(0.32 0.022 275);
+  --ring: oklch(0.7 0.17 285);
+
+  --brand-50: oklch(0.23 0.09 285);
+  --brand-100: oklch(0.28 0.11 285);
+  --brand-200: oklch(0.35 0.14 285);
+  --brand-300: oklch(0.44 0.17 285);
+  --brand-400: oklch(0.54 0.19 285);
+  --brand-500: oklch(0.63 0.2 285);
+  --brand-600: oklch(0.72 0.17 285);
+  --brand-700: oklch(0.79 0.14 285);
+  --brand-800: oklch(0.86 0.1 285);
+  --brand-900: oklch(0.92 0.06 285);
+  --brand-950: oklch(0.97 0.03 285);
+}
+
+/* ---------------------------------------------------------------------------
+   Expose the tokens to Tailwind utilities (bg-background, text-brand-500, ...)
+   --------------------------------------------------------------------------- */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+  --color-brand-950: var(--brand-950);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-display), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 10px);
+
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-in: fade-in 0.4s ease both;
+  --animate-shimmer: shimmer 2.2s linear infinite;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-pulse-ring: pulse-ring 2.4s ease-out infinite;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 45%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 14px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Base layer
+   --------------------------------------------------------------------------- */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklch, var(--primary) 25%, transparent);
+  }
+
+  /* Keep focus rings consistent for keyboard users. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* Scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklch, var(--muted-foreground) 35%, transparent) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: color-mix(in oklch, var(--muted-foreground) 30%, transparent);
+    border-radius: 9999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Component utilities
+   --------------------------------------------------------------------------- */
+@layer components {
+  /* The signature blue -> purple gradient. */
+  .bg-brand-gradient {
+    background-image: linear-gradient(
+      120deg,
+      var(--brand-600) 0%,
+      color-mix(in oklch, var(--brand-600) 70%, var(--accent-2)) 45%,
+      var(--accent-3) 100%
+    );
+  }
+
+  .dark .bg-brand-gradient {
+    background-image: linear-gradient(
+      120deg,
+      var(--brand-500) 0%,
+      color-mix(in oklch, var(--brand-500) 70%, var(--accent-2)) 45%,
+      var(--accent-3) 100%
+    );
+  }
+
+  .text-brand-gradient {
+    background-image: linear-gradient(120deg, var(--brand-500), var(--accent-3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .bg-brand-soft {
+    background-image: linear-gradient(
+      120deg,
+      color-mix(in oklch, var(--brand-500) 14%, transparent),
+      color-mix(in oklch, var(--accent-3) 14%, transparent)
+    );
+  }
+
+  /* Frosted panel used on top of the hero gradient. */
+  .glass {
+    background-color: color-mix(in oklch, var(--card) 72%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
+
+  /* Subtle dotted grid backdrop. */
+  .bg-grid {
+    background-image:
+      radial-gradient(circle at 1px 1px, color-mix(in oklch, var(--muted-foreground) 22%, transparent) 1px, transparent 0);
+    background-size: 26px 26px;
+  }
+
+  /* Soft radial glow used behind hero elements. */
+  .bg-glow {
+    background-image: radial-gradient(
+      60% 60% at 50% 40%,
+      color-mix(in oklch, var(--primary) 26%, transparent) 0%,
+      transparent 70%
+    );
+  }
+
+  .shimmer-bg {
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      color-mix(in oklch, var(--primary) 12%, transparent) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print styles — the resume preview prints to a clean A4 page. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+}
